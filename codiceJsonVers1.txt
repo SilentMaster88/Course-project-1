@@ -1,0 +1,189 @@
+public class TaskJson2 {
+ //Attributi della classe TaskJson2:	
+ public static  String Name { get; set;}
+ public static String City { get; set;}
+ public static String Street { get; set;}
+ public static String Country { get; set;}
+ // Attributo per i contatti:
+ static  ContactsJson[] ListaContacts;
+ // Attributo per le opportunita:
+ static OpportunitiesJson[] ListaOpp;
+ /**************************************************************** METODI DELLA CLASSE NON STATICI ******************************************************************************************/
+ // Costruttore:
+ // Metodo che preso un id account in ingresso restituisce una lista di contatti:
+ public List<ContactsJson> getContacts(ID act) {
+     
+    // Varibile di appoggio:
+    List<ContactsJson> ContactList = new List<ContactsJson>();  
+  	// Ciclo di ricerca dei contatti:
+    for(Contact cnt : [SELECT Name,Email FROM Contact WHERE AccountId=:act]) {
+    	ContactList.add(new ContactsJson(cnt.Name,cnt.Email));
+    }
+ 	
+ 	// Ritorno della lista di contatti trovata:
+    return ContactList;
+ }
+ // Metodo che preso un id account in ingresso restituisce una lista di opportunita:
+ public List<OpportunitiesJson> getOpportunities(ID acnt) {
+ 	// Varibile di appoggio:
+ 	List<OpportunitiesJson> OpportunitiesList = new List<OpportunitiesJson>();
+ 	// Ciclo di ricerca:
+ 	for(Opportunity opt: [SELECT createdDate,StageName FROM Opportunity WHERE AccountId=: acnt]) {
+       OpportunitiesList.add(new OpportunitiesJson(string.valueOf(opt.createdDate), opt.StageName));
+       }
+ 	// Ritorno della lista di opportunita trovata:
+ 	return OpportunitiesList;
+ }
+
+ // Metodo della classe che prende un ID in ingresso e converte tutto in una stringa JSON usando JSONGenerator fornito da salesforce:
+ public void GenerateJsonFromId(ID icv) {
+        
+    JSONGenerator gen = JSON.createGenerator(true);
+        
+    // Selezione in base all' id account,dei dati associati:
+    Account Ricerca=[ SELECT Id,Name,BillingStreet,BillingCity,BillingCountry,(SELECT Name,Email FROM Contacts),(SELECT CreatedDate,StageName FROM Opportunities)
+                      FROM Account WHERE Id =:icv];
+    // String TOJSON = GeneraOggetto(gen,RicercaCleaned);
+    // Configurazione dei dati per creare la stringa JSON:
+    gen.writeStartObject();
+    gen.writeStringField('Name',Ricerca.Name);
+    gen.writeStringField('City',Ricerca.BillingCity);
+    gen.writeStringField('Street',Ricerca.BillingStreet);
+    gen.writeStringField('Country',Ricerca.BillingCountry);
+    gen.writeFieldName('Contacts');
+    gen.writeStartObject();
+     for(Contact c: Ricerca.contacts){
+       gen.writeStringField('Name: ',c.Name);
+       gen.writeStringField('Email: ',c.Email);
+      }
+    gen.writeEndObject();
+    gen.writeFieldName('Opportunities');
+    gen.writeStartObject();
+     for(Opportunity o: Ricerca.opportunities){
+      // gen.writeDateField('CreationDate: ',o.CreatedDate);
+      gen.writeStringField('StageName: ',o.StageName);
+    }
+   gen.writeEndObject();
+   gen.writeEndObject();
+   // Generazione della stringa in JSON:
+   String TOJSON =gen.getAsString();
+   // Stampa in debug:
+   system.debug(TOJSON);
+  }
+    
+ // Metodo della classe Json con uso delle classi create appositamente: ContactsJon e OpportunitiesJson.
+ public  void RigenerateJsonFromIdAccount(ID Act) {
+ 	 
+    // Query di ricerca dato l'Id in ingresso:  
+    Account RicercaAct = [ SELECT Id,Name,BillingStreet,BillingCity,BillingCountry FROM Account WHERE Id =:Act];
+    //system.debug(RicercaAct);
+    
+    // Assegnazione dei valori trovati dalla query agli attributi della classe:
+    Name = RicercaAct.Name;
+    Street = RicercaAct.BillingStreet;
+    City = RicercaAct.BillingCity;   
+    Country = RicercaAct.BillingCountry;
+     
+    // Ricerca dei contatti usando la funzione getContacts:
+    ListaContacts = getContacts(Act);
+    // Ricerca dei contatti usando la funzione getOpportunities:    
+    ListaOpp = getOpportunities(Act);
+    // map principale:
+    map<String,Object> StringaJSON = new map<String,Object>();
+    // Mappa per i dati delle opportunita:
+    map<String,String> StringaOpties = new map<String,String>();
+    for(OpportunitiesJson opty: ListaOpp){
+      StringaOpties.put('CreatedDate',opty.creationDate);
+      StringaOpties.put('StageName',opty.status);
+    } 
+    // Mappa per i dati dei contatti:
+    map<String,String> StringaCnts = new map<String,String>();
+    for(ContactsJson c: ListaContacts){
+      StringaCnts.put('Name',c.Name);
+      StringaCnts.put('Email',c.Email);
+    }
+     // Inserimento nella mappa StringaJSON dei contatti e delle opportunita trovate:
+      
+    StringaJSON.put('opportunities: ',StringaOpties);
+    StringaJSON.put('Contacts: ',StringaCnts);
+   
+    // Inserimento dei datei dell'account:
+    StringaJSON.put('Country',Country);
+    StringaJSON.put('Address',Street);
+    StringaJSON.put('City',City);
+    StringaJSON.put('Name',Name);
+    StringaJSON.put('Account','');
+             
+    // Stampa a video della stringa creata:
+    system.debug(JSON.serializePretty(StringaJSON));
+      
+    }
+
+    /************************************************************** METODI STATICI DELLA  CLASSE  TASKJSON2  ***********************************************************************/
+    // Metodo che preso un id account in ingresso restituisce una lista di contatti:
+    public static List<ContactsJson> getContactStatic(ID act) {
+     
+     // Varibile di appoggio:
+     List<ContactsJson> ContactList = new List<ContactsJson>();  
+  	 // Ciclo di ricerca dei contatti:
+     for(Contact cnt : [SELECT Name,Email FROM Contact WHERE AccountId=:act]) {
+     	ContactList.add(new ContactsJson(cnt.Name,cnt.Email));
+     }
+ 	
+ 	 // Ritorno della lista di contatti trovata:
+     return ContactList;
+    }
+    // Metodo che preso un id account in ingresso restituisce una lista di opportunita:
+    public static List<OpportunitiesJson> getOpportunitieStatic(ID acnt) {
+ 	 // Varibile di appoggio:
+ 	 List<OpportunitiesJson> OpportunitiesList = new List<OpportunitiesJson>();
+ 	 // Ciclo di ricerca:
+ 	 for(Opportunity opt: [SELECT createdDate,StageName FROM Opportunity WHERE AccountId=: acnt]) {
+        OpportunitiesList.add(new OpportunitiesJson(string.valueOf(opt.createdDate), opt.StageName));
+        }
+ 	 // Ritorno della lista di opportunita trovata:
+ 	 return OpportunitiesList;
+    } 
+
+    // Metodo statico della classe che dato un Id in ingresso restituisce una stringa Json:
+    public static void JsonFromId(Id Acts) {
+      // Query di ricerca dato l'Id in ingresso:  
+      Account RicercaAct = [ SELECT Id,Name,BillingStreet,BillingCity,BillingCountry FROM Account WHERE Id =:Acts];
+      //system.debug(RicercaAct);	
+      // Assegnazione dei valori trovati dalla query agli attributi della classe:
+      Name = RicercaAct.Name;
+      Street = RicercaAct.BillingStreet;
+      City = RicercaAct.BillingCity;   
+      Country = RicercaAct.BillingCountry;
+      // Ricerca dei contatti usando la funzione getContacts:
+       ListaContacts = getContactStatic(Acts);
+      // Ricerca dei contatti usando la funzione getOpportunities:    
+      ListaOpp = getOpportunitieStatic(Acts);
+      // map principale:
+      map<String,Object> StringaJSON = new map<String,Object>();
+      // Mappa per i dati delle opportunita:
+      map<String,String> StringaOpties = new map<String,String>();
+      for(OpportunitiesJson opty: ListaOpp){
+       StringaOpties.put('CreatedDate',opty.creationDate);
+       StringaOpties.put('StageName',opty.status);
+      } 
+      // Mappa per i dati dei contatti:
+      map<String,String> StringaCnts = new map<String,String>();
+      for(ContactsJson c: ListaContacts){
+        StringaCnts.put('Name',c.Name);
+        StringaCnts.put('Email',c.Email);
+      }
+     // Inserimento nella mappa StringaJSON dei contatti e delle opportunita trovate:
+     StringaJSON.put('opportunities: ',StringaOpties);
+     StringaJSON.put('Contacts: ',StringaCnts);
+     // Inserimento dei datei dell'account:
+     StringaJSON.put('Country',Country);
+     StringaJSON.put('Address',Street);
+     StringaJSON.put('City',City);
+     StringaJSON.put('Name',Name);
+     StringaJSON.put('Account','');
+     // Stampa a video della stringa creata:
+    system.debug(JSON.serializePretty(StringaJSON));
+    }
+
+}

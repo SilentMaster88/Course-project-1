@@ -1,0 +1,11 @@
+// Classe ContactsJson per poter inserire i dati in una stringa Json:
+public class ContactsJson {
+ public String name;	// Nome
+ public String email;   // Email
+ // Costruttore della classe parametrizzato:       
+ public ContactsJson(string n, string e)
+ {
+  name=n;
+  email=e;
+ }
+}

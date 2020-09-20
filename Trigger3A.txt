@@ -1,0 +1,84 @@
+// Trigger Abort Update:
+trigger AbortUpdateOpportunity on UpdatedOpportunities__c (after insert) {
+    Set<ID> appId = new Set<ID>();
+   for(InsertedOpportunity__c opt : [SELECT Opportunity_insert__c FROM InsertedOpportunity__c]) {
+      appId.add(opt.Opportunity_insert__c);
+  }
+  //
+  for(UpdatedOpportunities__c listOpp : Trigger.New) {
+        if(appId.contains(listOpp.Opportunity__c)){
+          listOpp.addError('Inserimento abortito');
+          }
+    }
+}
+
+//Trigger Find Inserted Opportunity:
+trigger FindInsertedOpportunity on Opportunity (after insert,after update,after delete) {
+  
+    List <InsertedOpportunity__c> Inserisci = new List<InsertedOpportunity__c>();
+    
+    InsertedOpportunity__c Ricerca = new InsertedOpportunity__c();
+       
+    if(Trigger.isUpdate){
+        for (Opportunity app : [SELECT  Id,Name FROM Opportunity WHERE ID IN:Trigger.new]){
+           Ricerca.Name = app.Name;
+           Ricerca.Opportunity_insert__c = app.Id;
+           Inserisci.add(Ricerca);
+        }
+        try
+        {
+         insert Inserisci;
+        }
+        catch(DMLException e )
+        {
+           system.debug('Errore trovato: '+ e);   
+        }
+    }
+}
+
+//Trigger Find Updated Opportunities:
+trigger FindUpdatedOpportunities on Opportunity (before update,before insert,before delete) {
+    
+    List <UpdatedOpportunities__c> Inserisci = new List<UpdatedOpportunities__c>();
+    
+    UpdatedOpportunities__c Ricerca = new UpdatedOpportunities__c();
+       
+    if(Trigger.isUpdate){
+        for (Opportunity app : [SELECT  Id,Name FROM Opportunity WHERE ID IN:Trigger.new]){
+            Ricerca.Opportunity__c = app.Id; 
+            Ricerca.Name = app.Name;
+            Inserisci.add(Ricerca);
+        }
+        try
+        {
+         insert Inserisci;
+        }
+        catch(DMLException e )
+        {
+            system.debug('Errore trovato: '+ e);  
+        }
+           
+    }  
+}
+
+//Trigger Find New Opportunity:
+trigger FindNewOpportunity on Opportunity (before insert) {
+   // Funziona:
+  List <NewOpportunity__c> Inserisci = new List<NewOpportunity__c>();
+  //
+  if(Trigger.isInsert){
+  NewOpportunity__c Ricerca = new NewOpportunity__c(); 
+   for (Opportunity app : Trigger.new){
+      Ricerca.Name = app.Name;
+      Inserisci.add(Ricerca);
+   }
+    try
+        {
+         insert Inserisci;
+        }
+        catch(DMLException e )
+        {
+         system.debug('Errore trovato: '+ e);  
+        }
+  }
+}

@@ -1,0 +1,47 @@
+trigger CreateOrder on Opportunity (after Update) {
+	
+    list<Order> ListAordini = new List<Order>();
+    List<OrderItem> OrdiniProdotti = new List<OrderItem>();
+    
+    for(Opportunity op : trigger.new){
+        
+        if(op.StageName=='Closed Won' && op.Probability==100 && trigger.oldMap.get(op.Id).stageName != 'Closed Won'){
+            Order NuovOrdine= new Order(AccountId= op.AccountId, OpportunityId=op.id, 
+            	EffectiveDate=date.today(), Status='Draft', Pricebook2Id = op.Pricebook2Id);
+            
+            ListAordini.add(NuovOrdine);
+           
+        }
+    }
+    try {
+     insert ListAordini;
+    }
+    catch(DMLException e) {
+      system.debug("Errore: " + e);
+    }
+    Map<Id, Order> MapOrder = new Map<Id, Order>();
+
+    for(Order ord : ListAordini) {
+        MapOrder.put(ord.OpportunityId, ord);
+    }
+
+    for(Opportunity op: trigger.new)
+    {
+        for(OpportunityLineItem pr : [SELECT Id, Product2Id, Quantity, UnitPrice, PriceBookEntryId 
+        	FROM OpportunityLineItem WHERE OpportunityId = :op.id])
+            {
+                OrdiniProdotti.add(new OrderItem(OrderId = ordMap.get(op.Id).Id ,Product2Id = pr.Product2Id, 
+                	Quantity=pr.Quantity, PriceBookEntryId=pr.PricebookEntryId, UnitPrice=pr.UnitPrice));
+            }
+    }
+
+    if(OrdiniProdotti.size()>0)
+    {
+      try{
+        Insert OrdiniProdotti;
+      }
+      catch(DMLException e) {
+      system.debug("Errore: " + e);
+    }
+    }
+}

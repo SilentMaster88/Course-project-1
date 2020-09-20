@@ -1,0 +1,1120 @@
+Classi Apex:
+public class StringArrayTest 
+{
+ public static String[] generateStringArray(integer len) 
+ {
+  String[] Arraytest = new List<String>();
+  for(Integer i=0;i< len;i++) 
+  {
+   Arraytest.add('Test ' +i);          
+   System.debug(Arraytest[i]);
+  } 
+  return Arraytest;
+ }   
+}
+
+// Stampa n volte "Test 0,Test 1",con n passato come parametro della funzione
+/***************************************************************************************************************************************************************************************************/
+
+public class AccountHandler 
+{
+ public static Account insertNewAccount(String name) 
+ {
+  Account test = new Account();
+  test.Name = name;
+  try
+  {
+   insert test;
+  }
+  catch (Exception e) 
+  {
+   return null;
+  }
+  return test;
+ }
+}
+// Inserisce un record in account,passando il nome.
+/***************************************************************************************************************************************************************************************************/
+public class ContactSearch 
+{
+ public static List<Contact> searchForContacts(String last, String post) 
+ {
+  List<Contact> contacts = new List<Contact>();
+  contacts = [SELECT ID, Name from Contact
+              where LastName = :last AND MailingPostalCode = :post];
+             return contacts;
+ }
+}
+
+//
+
+
+public class ContactAndLeadSearch
+{
+    public static List<List<SObject>> searchContactsAndLeads(String str)
+    {
+        List<List<sObject>> searchContactsAndLeadsList = [FIND :str IN ALL FIELDS RETURNING Contact(FirstName,LastName) ,Lead(FirstName,Lastname)];
+        return searchContactsAndLeadsList ;
+    }
+
+}
+//
+
+public class ContactAndLeadSearch
+{
+    public static List<List<SObject>> searchContactsAndLeads(String str)
+    {
+        List<List<sObject>> searchContactsAndLeadsList = [FIND :str IN ALL FIELDS RETURNING Contact(FirstName,LastName) ,Lead(FirstName,Lastname)];
+        return searchContactsAndLeadsList ;
+    }
+
+}
+
+//
+
+public class MerchandiseUtility {
+    public static void mainProcessing(){
+        try{
+            insertMerchandise();
+        }
+        catch(MerchandiseException me)
+        {
+         System.debug('Message:      ' + me.getMessage());
+         System.debug('Cause:        ' + me.getCause());
+         System.debug('Line number:  ' + me.getLineNumber());
+         System.debug('Stack trace:  ' + me.getStackTraceString());
+        }
+    }
+    
+    public static void insertMerchandise(){
+        try{
+            //
+            Merchandise__c m = new Merchandise__c();
+            insert m;
+        } 
+        catch(DmlException e ){
+            //
+            //
+            //
+            throw new MerchandiseException('Merchandise item could not be inserted',e);
+        }
+    }
+
+}
+
+MerchandiseUtility.mainProcessing();
+/***************************************************************************************************************************************************************************************************/
+
+//
+Account[] accounts = [ SELECT Name,BillingCountry FROM Account];
+for(Account curacc: accounts){
+     System.debug('ID Account:    ' + curacc.Id);
+     System.debug('Nome account:  ' + curacc.Name);
+     System.debug('Nazione:       ' + curacc.BillingCountry);
+}
+
+//
+Account[] accounts = [SELECT Name,BillingCountry F
+                      FROM Account
+                      ORDER BY BillingCountry ASC,Name DESC];
+for(Account curacc: accounts){
+  System.debug('Billing Country:  ' + curacc.BillingCountry + '  ' + curacc.Name);    
+}
+
+//
+Account[] accounts = [SELECT Name,BillingCountry 
+                      FROM Account
+                      ORDER BY BillingCountry ASC,Name DESC];
+for(Account curacc: accounts){
+  System.debug('Billing Country:  ' + curacc.BillingCountry);
+  System.debug('Nome:  ' + curacc.Name);    
+}
+
+//
+Account[] accounts = [SELECT Name,BillingCountry 
+                      FROM Account
+                      WHERE NOT(BillingCountry LIKE 'Can%')];
+for(Account curacc: accounts){
+  System.debug('Billing Country:  ' + curacc.BillingCountry);
+  System.debug('Nome:  ' + curacc.Name);    
+}
+//
+SELECT Id,Name,Firstname 
+FROM  Contact
+WHERE FirstName LIKE '%%O'  
+
+//
+SELECT Id,Name,Firstname 
+FROM  Contact
+WHERE FirstName LIKE '_O%'  
+
+//
+SELECT Id,Name,Firstname 
+FROM  Contact
+WHERE FirstName LIKE '%EA%'  
+
+//
+Account[] accounts = [SELECT Name,BillingCountry 
+                      FROM Account
+                      WHERE NOT(BillingCountry LIKE 'Can%')];
+for(Account curacc: accounts){
+  System.debug('Billing Country:  ' + curacc.BillingCountry);
+  System.debug('Nome:  ' + curacc.Name);    
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Account> ac = [SELECT Name FROM Account WHERE Name='Dickenson plc' LIMIT 1];
+//System.debug(ac);
+if(ac.size() >=0){
+    
+}
+else
+{
+ System.debug('Nessun acocunt presesente con i criteri impostati');
+}
+//
+List<Account> ac = [SELECT Name FROM Account WHERE Name='Dickenson plc' LIMIT 1];
+//System.debug(ac);
+if(ac.size() >=0){
+    System.debug('ID: ' + ac[0].Id +'Nome:  ' + ac[0].name);
+}
+else
+{
+ System.debug('Nessun acocunt presesente con i criteri impostati');
+}
+//
+SELECT AVG(AMOUNT)
+FROM Opportunity
+
+//
+Integer I = [SELECT COUNT() FROM Account Where Name LIKE '%u%'];
+System.debu(I);
+
+//
+AggregateResult ar = [ SELECT AVG(AnnualRevenue) FROM Account ];
+System.debug(ar.get('expr0'));
+expr0 -> AVG(AnnualRevenue)
+
+//
+Query: SELECT AVG(AnnualRevenue) averagerevenue FROM Account
+Apex: 
+
+// 
+AggregateResult[] numAccountsByCountry =
+   [
+    SELECT COUNT(Name),billingcountry
+    FROM Account
+    GROUP BY billincountry;];
+
+AggregateResult[] numAccountsByCountry = [
+    SELECT COUNT(Name),billingcountry
+    FROM Account
+    GROUP BY billingcountry ];
+
+System.debug('Nazione: ' + numAccountsByCountry.billingcountry + 'Numero account: ' + numAccountsByCountry.get('expr0') );
+
+//
+AggregateResult[] numAccountsByCountry = [
+    SELECT COUNT(Name),billingcountry
+    FROM Account
+    GROUP BY billingcountry ];
+for (AggregateResult ar : numAccountsByCountry)  
+{
+ System.debug('Billing Country' + ar.get('eprx0') + '\t' + ar.get('billingcountry'));   
+}
+//System.debug('Nazione: ' + numAccountsByCountry.billingcountry + 'Numero account: ' + numAccountsByCountry.get('expr0') );
+AggregateResult[] numAccountsByCountry = [
+    SELECT COUNT(Name),billingcountry
+    FROM Account
+    GROUP BY billingcountry ];
+for (AggregateResult ar : numAccountsByCountry)  
+{
+ System.debug('Billing Country' + ar.get('eprx0') + '\t' + ar.get('billingcountry'));   
+}
+//System.debug('Nazione: ' + numAccountsByCountry.billingcountry + 'Numero account: ' + numAccountsByCountry.get('expr0') );
+
+/**************************************************************************************************************************************************************************************************/
+AggregateResult[] duplicates = [
+    SELECT Name,COUNT(Id) 
+    FROM Account
+    GROUP BY Name
+    HAVING COUNT(Id)>1];
+for (AggregateResult ar : duplicates)  
+{
+ system.debug('Name: '+ ar.get() + '\t' + ar.get());
+}
+// Salvataggio dei dati:
+List<Job_Application__c> Data =[SELECT Name,Position__r.Department__c FROM Job_Application__c];
+// 
+for(Job_Application__c pos: Data){
+  // Verifica se non ha il padre:
+    if(pos.Position__r.Department__c != NULL){
+        system.debug('Nome: ' + pos.Name);
+    }
+    else
+    {
+      system.debug('Il record non ha una relazione');  
+    }
+}
+//**************************************************************************************************************************************************************************************************/
+// Query:
+// Salvataggio dei dati:
+List<Job_Application__c> Data =[SELECT Name,Position__r.Department__c FROM Job_Application__c];
+// 
+for(Job_Application__c pos: Data){
+  // Verifica se non ha il padre:
+    if(pos.Position__r.Department__c != NULL){
+        system.debug('Nome: ' + pos.Name + ' Dipartimento: ' + pos.Position__r.Department__c);
+    }
+    else
+    {
+      system.debug('Il record non ha una relazione');  
+    }
+}
+/***************************************************************************************************************************************************************************************************/
+// Salvataggio dei dati:
+List<Job_Application__c> Data =[ SELECT Name,Status__C,Position__r.Name FROM Job_Application__c WHERE Position__c != NULL];
+// 
+for(Job_Application__c pos: Data){
+   system.debug('Nome: ' + pos.Name + ' Posizione: ' + pos.Position__r.Name + ' Status: ' + pos.Status__c);
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Position__c> positions = [ SELECT Name
+                                FROM Position__c 
+                                WHERE Id IN (SELECT Position__c FROM Job_Application__c)];
+
+// Ciclo for
+for(Position__c Position : positions){
+    System.debug('Applications have been received for:  ' + Position.Name);
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Position__c> positiona = [ SELECT Name,(SELECT Name FROM Job_Applications__r) FROM Position__C];
+for(Position__C position : positions){
+ for(Job_Application__c app : position.Job_Applications__r){
+    System.debug(position.Name + ': ' + app.Name);
+ }
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Position__c> position = [ SELECT Name,(SELECT Name FROM Job_Applications__r) FROM Position__c];
+
+for(Position__c position: positions)
+{
+ for(Job_Application__c app : positions.Job_Applications__r)
+ {
+    System.debug(positions.Name + ': ' + app.Name);
+ }
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Account> position = [ SELECT Name,(SELECT Name FROM Contacts) FROM Account];
+
+//
+for(Account app: position){
+    System.debug('Account: ' + app.Name);
+     // if - else
+     if(app.contacts.size()>0){
+        System.debug('Contatti trovati: ');
+         for(Contact c: app.contacts){
+             System.debug(c.Name);
+         }
+     }
+     else
+     {
+      system.debug('Non ci sono contatti corellati');   
+     }
+}
+/***************************************************************************************************************************************************************************************************/
+//
+List<Position__c> positions = [ SELECT Name
+                                FROM Position__c 
+                                WHERE Id NOT IN (SELECT Position__c FROM Job_Application__c)];
+
+// Ciclo for
+for(Position__c Position : positions){
+    System.debug('No application for:  ' + Position.Name);
+}
+/***************************************************************************************************************************************************************************************************/
+Esercizi query:
+Selezionare le 
+opportunity con amount> 100000$ con case associati,e name e type dell'account:
+
+SELECT Id,Name,Amount,Account.Id,Account.Name,Account.type
+FROM Opportunity 
+WHERE Amount>100000 AND AccountID IN ( SELECT AccountID FROM Case ) AND AccountID IN ( SELECT Id FROM ACCOUNT) 
+
+Codice APEX:
+// Lista:
+List<Opportunity> selezione = [SELECt Id,Name,Amount,Account.Id,Account.Name,Account.type
+                               FROM Opportunity
+                               WHERE Amount>100000 AND AccountID IN ( SELECT AccountID FROM Case) ];
+// Stampa dei dati:
+for(Opportunity app: selezione)
+{  
+ System.debug('ID:     ' + app.Id + ' Name:  ' + app.Name + 'Amount: ' + app.Amount + ' ID Account: ' 
+               + app.Account.Name + ' Type account:  ' + app.Account.Type);
+}
+
+/***************************************************************************************************************************************************************************************************/
+Selezionare tutti gli account che hanno sia Contact che Cases relazionati e per ognuno mostrare la lista dei contatti e dei case relazionati:
+
+SELECT  Id,Name,(SELECT CaseNumber FROM Cases),(SELECT Name FROM Contacts)
+FROM Account
+WHERE Id IN ( SELECT AccountID FROM Case ) 
+
+Codice APEX:
+// Lista:
+List<Account> selezione = [ SELECT  Id,Name,(SELECT CaseNumber FROM Cases) Casenum,(SELECT Name FROM Contacts) namecont
+                            FROM Account
+                            WHERE Id IN ( SELECT AccountID FROM Case )  AND Id IN ( SELECT AccountID FROM Contact)
+                           ];
+
+// Stampa dei dati:
+// Lista:
+List<Account> selezione = [ SELECT  Id,Name,(SELECT Name FROM Contacts),(SELECT CaseNumber FROM Cases)
+                            FROM Account
+                            WHERE Id IN ( SELECT AccountID FROM Case )  AND Id IN ( SELECT AccountID FROM Contact)
+                           ];
+
+// Stampa dei dati:
+for(Account app: selezione)
+{  
+ system.debug('ID: '+ app.Id + ' Account Name: '+ app.Name);
+ for(Contact c: app.contacts){
+  system.debug('Contacts:  ' + c.Name);  
+     for(Case ca: app.cases){
+         system.debug('Case number: ' +ca.CaseNumber);
+     }
+ }
+} 
+/***************************************************************************************************************************************************************************************************/
+Creare una classe QueryRelatedRecords con 2 metodi statici
+ 
+public static void contattiAssociati(String accName)
+public static void accountAssociati(String contactLastName)
+Il 1 metodo
+        //stampa la lista dei contatti associati all'account passato in argomento al metodo
+       // lavora in bulk
+Il 2 metodo
+        // vogliamo l'Account relazionato al contatto il cui cognome passiamo come parametro
+
+NB: Account non esiste
+/**********************************************************************************************************************************/***********************************/
+LINGUAGGIO SOSL:
+FIND (mapping) RETURNING Account
+FIND {company} IN ALL FIELDS RETURNING Account,Contact
+FIND {company} IN ALL FIELDS RETURNING Account(Name),Contact(Name)
+FIND {Acme} IN ALL FIELDS RETURNING Account(Id,Name,Rating)
+SOSL + APEX:
+// Lista 
+List<List<Account>> Ricerca = [FIND 'Acme' IN ALL FIELDS RETURNING Account(Id,Name,Rating)];
+
+// Stampa dei dati:
+for(Account app : Ricerca[0]){
+   system.debug('ID:  '+ app.Id + 'Name: ' + app.Name + ' Rating: '+ app.Rating);
+}
+//system.debug(Ricerca);
+/************************************************************************************************************************************************************************/
+// Lista di lista
+List<List<sObject>> Ricerca = [FIND '(Acme OR Company)' IN ALL FIELDS RETURNING Account(Name),Contact(FirstName,LastName,Department)];
+// Separazione della ricerca in lista separate:
+List<Account> accountsr = Ricerca[0];
+List<Contact> contactsr = Ricerca[1];
+
+// Stampa dei dati:
+for(Account app: accountsr){
+    //system.debug('Account name: ' + app.Name);
+    for(Contact app1: contactsr){
+        system.debug('Account name: \t' + app.Name +'Contact Firstname: \t' + app1.FirstName + 'Contact Lastname: \t'+ app1.LastName + 'Contact department: ' + app1.Department);
+    }
+}
+//system.debug(Ricerca);
+/********************************************************************************************************************************************************************************/
+DML:
+Account myAcc = new Account(Name='My test ET Labora Acc');
+Insert MyAcc;
+System.debug('Account Name: ' myAcc.Name + 'Account ID: ' + myAcc,Id);
+
+/***********************************************************************************************************************************************************************************************/
+// Lista di contatti e Creazione di 4 contatti:
+List<Contact> conts = new List<Contact>{
+   new Contact(FirstName = 'Jo',Lastname='Smith',Department='Finance'),
+   new Contact(FirstName = 'Kathy',Lastname='Smith',Department='Technology'),
+   new Contact(FirstName = 'Caroline',Lastname='Roth',Department='Finance'),
+       new Contact(FirstName = 'Kim',Lastname='Shain',Department='Education')};
+
+// Inserimento in bulk con 1 DML:
+insert conts;
+
+// List per contenere i contatti da aggiornare:
+List<Contact> listUp = new list<Contact>();
+
+//Ciclo per aggiornare i record con dipartimento uguale a Finance
+for(Contact con: conts){
+    if(con.Department=='Finance'){
+        con.Title='Financial analyst';
+        listUp.add(con);
+    }    
+}
+
+// Update dei dati in DB con bulk update(200 record per ciclo):
+update listUp;
+
+/**************************************************************************************************************************************************************************************************/
+
+//
+Account acmeDynamite = new Account();
+Account acmeAnvils = new Account();
+acmeAnvils.Name = 'Acme Anvils';
+acmeDynami
+//
+List<Account> accounts = new list<Account>{acmeDynamite,acmeAnvils};
+//
+try{
+    insert accounts;
+}
+catch(DMLException e){
+    system.debug('Eccezione: '+e.getMessage());
+}
+//
+Account[] anvils = [SELECT Id FROM Account WHERE Name='Acme Anvils'];
+
+//
+if(anvils.isEmpty()){
+    system.debug('Anvils was not persisted because Dynamite failed first');
+}
+/**************************************************************************************************************************************************************************************************/
+//
+Account acmeDynamite = new Account();
+Account acmeAnvils = new Account();
+acmeAnvils.Name = 'Acme Anvils';
+
+//
+List<Account> accounts = new list<Account>{acmeDynamite,acmeAnvils};
+//
+Databas.SaveResult[] sr = database.insert(accounts,false);
+
+Account[] anvils = [SELECT Id FROM Account WHERE Name = 'Acme Anvils'];
+
+//
+if(anvils.isEmpty()){
+    system.debug('Very unusual');
+}
+/***************************************************************************************************************************************************************************************************/
+// 
+Account acmeRockets = new Account();
+Account acmeSkates = new Account(name='Acme Skates');
+
+//
+List<Account> accounts = new List<Account> {acmeRockets,acmeSkates};
+    
+//
+database.SaveResult []  insertResult;
+insertResult = database.insert(accounts,false);
+//
+for(database.SaveResult sr : insertResult){
+    if(sr.isSuccess()){
+        system.debug('Insert sucessfull. Account id: '+sr.getId());
+    } else{
+        for(database.Error err: sr.getErrors()){
+            system.debug('THe following error has occured');
+            system.debug(err.getStatusCode() + ':' + err.getMessage());
+             system.debug('Error fiedls:' + ':' + err.getFields());                
+        }
+    }
+}
+/***************************************************************************************************************************************************************************************************/
+// Lista di account:
+List<Account> accList = new list<Account>();
+
+//Ciclo di inserimento dei 100 account in una list:
+for(Integer i=0;i<1000;i++){
+    Account a = new Account(Name='MyAcc',type='Prospect');
+    accList.add(a);
+}
+
+// Inserimento in db
+
+insert accList;
+
+// Cancellazione:
+
+delete [SELECT Id FROM Account WHERE Name='MyAcc'];
+
+/***************************************************************************************************************************************************************************************************/
+// Numero iterazioni;ù
+Integer iterazioni = 0;
+// Lista di account:
+List<Account> accList = new list<Account>();
+
+//Ciclo di inserimento dei 100 account in una list:
+for(Integer i=0;i<1000;i++){
+    Account a = new Account(Name='MyAcc',type='Prospect');
+    accList.add(a);
+}
+
+// Inserimento in dv
+
+insert accList;
+
+// Ciclo for in bulk:
+for(List<Account> acc2List : [SELECT Id FROM Account WHERE Name='MyAcc']){
+    iterazioni++;
+    system.debug('Elementi lista:  '+acc2List.size() + 'Iterazione numero: '+ iterazioni);
+    for(Account a: acc2List){
+        a.type='Pending';
+    }
+    update acc2List;
+}
+
+//delete [SELECT Id FROM Account WHERE Name='MyAcc'];
+/***************************************************************************************************************************************************************************************************/
+/*
+// Numero iterazioni;ù
+Integer iterazioni = 0;
+// Lista di account:
+List<Account> accList = new list<Account>();
+
+//Ciclo di inserimento dei 100 account in una list:
+for(Integer i=0;i<1000;i++){
+    Account a = new Account(Name='MyAcc',type='Prospect');
+    accList.add(a);
+}
+
+// Inserimento in dv
+
+insert accList;
+
+// Ciclo for in bulk:
+for(List<Account> acc2List : [SELECT Id FROM Account WHERE Name='MyAcc']){
+    iterazioni++;
+    system.debug('Elementi lista:  '+acc2List.size() + 'Iterazione numero: '+ iterazioni);
+    for(Account a: acc2List){
+        a.type='Pending';
+    }
+    update acc2List;
+}
+*/
+//delete [SELECT Id FROM Account WHERE Name='MyAcc'];
+
+// Lista di account:
+List<Account> accList = new list<Account>();
+
+//Ciclo di inserimento dei 100 account in una list:
+for(Integer i=0;i<1000;i++){
+    Account a = new Account(Name='MyAcc',type='Prospect');
+    accList.add(a);
+}
+
+// Inserimento in db
+
+insert accList;
+//
+List<Account> recordToUpdate= new List<Account>();
+
+// 
+for(Account a: [SELECT Id FROM Account WHERE Name='MyAcc']){
+    a.type='pending';
+    recordToUpdate.add(a);
+}
+
+//
+insert recordToUpdate;
+/***************************************************************************************************************************************************************************************************/
+//
+try{
+    Contact c = [SELECT Account.Name FROM Contact WHERE Firstname='Joe' AND Lastname='Smith' LIMIT 1];
+    c.phone='1111111';
+    c.Account.Industry='Education';
+    update c;
+    update c.Account;
+} catch(DmlException e){
+    system.debug('è avvenuto un errore: ' + e.getMessage());
+}
+/***************************************************************************************************************************************************************************************************/
+// Department uguale a engineering
+// Se hanno figli cancellarli e creare una nuova job_application
+
+//
+SOQL:
+SELECT Id,(SELECT Id FROM Job_Applications__r) FROM Position__c WHERE Department__c='engineering'
+
+APEX:
+// Position dove Department uguale a engineering
+// Se hanno figli cancellarli e creare una nuova job_application
+
+// Ricerca e salvataggio nella lista:
+
+List <Position__c> RicercaDati = [SELECT Id,(SELECT Id FROM Job_Applications__r) FROM Position__c WHERE Department__c='engineering'];
+List <Job_Application__c> DelJobApp = new List<Job_Application__c>();
+List <Job_Application__c> AddJobApp = new List<Job_Application__c>();
+//System.debug(RicercaDati);
+
+// Ciclo for di ricerca dei nodi figli:
+for(Position__c posz: RicercaDati){
+    // Verifica se ha figli oppure no:
+    if(posz.Job_Applications__r.size()>0){
+        system.debug('ID: ' + posz.Id + 'Nodi figli presenti');
+        // Selezione dei figli:
+        for(Job_Application__c ricerca: posz.Job_Applications__r){
+            DelJobApp.add(ricerca);
+        }
+    }
+    else{ 
+        // Figli non trovati
+        system.debug('Nodi Figli non presenti');
+        // Nuovo Job App
+        system.debug('Creazione nuova Job Applications');
+        Job_Application__c jobnew = new Job_Application__c(.I);
+        
+        //jobnew.Id=posz.Job_Applications__r.Id;
+        AddJobApp.add(jobnew);
+    }
+}
+//
+//system.debug(DelJobApp);
+
+// Cancellazione dei nodi:
+delete DelJobApp;
+
+// Inserimento dei nuovi JobApp
+insert AddJobApp;
+ 
+/***************************************************************************************************************************************************************************************************/
+// Esercizio su upsert:
+//
+List<Account> accts = [SELECT Id FROM Account WHERE Name='Acme'];
+List<Account> app= new List<Account>();
+
+//
+for(Account a: accts){
+    a.Rating='2000';
+    app.add(a);
+}
+
+//
+List<account> myNewList = new List<Account> {
+   new Account(Name='My test 1 acc',Rating='2000'),
+   new Account(Name='My test 2 acc',Rating='2000')    
+};
+    
+//
+app.addAll(myNewList);
+
+//
+upsert app;
+/***************************************************************************************************************************************************************************************************/
+//
+/*
+List<Candidate__c> cands = new List<Candidate__c>();
+
+// Generazione dei candidati
+for(Integer I=0;i<300;i++){
+    Candidate__c app = new Candidate__c(First_name__c='Cand'+i,Last_Name__c='Test'+i,Email__c='prova'+i+'@email.com');
+    cands.add(app); 
+}
+
+// Database insert:
+database.insert(cands);
+
+// Codice di ricerca dei contatti creati: 
+List<Contact> ricerca = new List<Contact>();
+*/
+//
+
+// Codice di cancellazione dei 300 record candidates e account:
+// Ricerca dei contatti:
+List<Contact> ToDelete = [SELECT Firstname,Lastname,Email FROM Contact WHERE Email LIKE '%@email.com%'];
+system.debug('Contatti trovati:' +ToDelete.size());
+
+//
+
+/***************************************************************************************************************************************************************************************************/
+trigger AddRelatedRecord on Account (after insert,after update) {
+ // Lista vuota di opportunity:
+ List<Opportunity> listaAcc = new List<Opportunity>();
+ // Mappatura dei dati  con selezione dei record:
+ Map<Id,Account> AccEopp = new Map<Id,Account>(
+       [SELECT Id,(SELECT Id FROM Opportunities ) FROM Account WHERE Id IN : Trigger.new ]
+     ); 
+ // Ciclo di ricerca:
+ for(Account acts : Trigger.new){
+     if(AccEopp.get(acts.Id).Opportunities.size()==0) {
+         listaAcc.add(new Opportunity(Name=acts.name+'Opportunity',StageName='',CloseDate=system.today(),AccountId=acts.Id));
+     }
+ }
+ //
+ if(listaAcc.size()>0){
+    insert listaAcc;       
+ } 
+}
+/***************************************************************************************************************************************************************************************************/
+trigger LeadPreventDuplicate on Lead (before insert,before update) {
+ // 
+ // Mappatura dei dati  con selezione dei record:
+ Map<String,Lead> LeadDupl = new Map<String,Lead>(); 
+ // 
+ for(Lead Lea: Trigger.new){
+   if((Lea.Email!=NULL)&&(Trigger.isInsert) || (Lea.Email!= Trigger.oldMap.get(Lea.Id).Email)){
+     if(LeadDupl.containsKey(Lea.Email)){
+           Lea.Email.addError('Mail duplicata');
+     }
+     else{
+          LeadDupl.put(Lea.Email,Lea); 
+    }
+   } 
+  }
+    
+  //
+  //    
+  for(Lead Led1: [SELECT Email FROM Lead WHERE Email IN :LeadDupl.keySet()]){
+        Lead newLead= LeadDupl.get(Led1.Email);
+        newLead.Email.addError('Mail duplicata');
+    }
+}
+/***************************************************************************************************************************************************************************************************/
+try{
+    List<Lead>leadList = new List<Lead>();
+    leadList.add(new Lead(email='training@test.it', lastname='test', company='company'));
+    leadList.add( new Lead(email='training1@test.it', lastname='test1', company='company1'));
+    leadList.add( new Lead(email='training2@test.it', lastname='test2', company='company2'));
+    leadList.add( new Lead(email='training@test.it', lastname='test3', company='company3'));
+                 
+    insert leadList;   
+}catch(Exception e){
+    System.debug(e.getMessage());
+}
+/***************************************************************************************************************************************************************************************************/
+List<Lead> leadList = new List<Lead>();
+leadList.add(new Lead(email='training@test.it', lastname='test', company='company'));
+leadList.add( new Lead(email='training1@test.it', lastname='test1', company='company1'));
+leadList.add( new Lead(email='training2@test.it', lastname='test2', company='company2'));
+leadList.add( new Lead(email='training@test.it', lastname='test3', company='company3'));
+Database.SaveResult [] insertResult= database.insert(leadList, false);
+for (Database.SaveResult sr : insertResult) {
+   if (!sr.isSuccess()) {
+       System.debug('Insert not Succeeded’);
+       for (Database.Error err : sr.getErrors()) {
+           System.debug('The following error has occurred.');
+           System.debug(err.getMessage());
+       }
+   }
+}
+/***************************************************************************************************************************************************************************************************/
+trigger AccountDeletion on Account (before delete) {
+ List <Account> RicercaDati= new List<account>();
+ // Ciclo di iterazione con SELECT    
+ for(Account accounts: [SELECT Id,Name FROM Account WHERE Id IN : Trigger.old AND Id IN (SELECT AccountId FROM Opportunity)]){
+     if(accounts.Id!=NULL){ // Record non cancellabile
+        Account app=Trigger.oldmap.get(accounts.Id); 
+        app.addError('Record non cancellabile,è presente un opportunita');  
+     }
+     else{ // Se è cancellabile
+       RicercaDati.add(accounts);   
+     }
+    Delete RicercaDati;
+ }
+ // 
+}
+/***************************************************************************************************************************************************************************************************/
+Trigger Migliorato:
+trigger AccountDeletion on Account (before delete) {
+ List <Account> RicercaDati= new List<account>();
+ // Ciclo di iterazione con SELECT    
+ for(Account accounts: [SELECT Id,Name FROM Account WHERE Id IN : Trigger.old AND Id IN (SELECT AccountId FROM Opportunity)]){
+      Trigger.oldmap.get(accounts.Id).addError('Record non cancellabile,è presente un opportunita');  
+     }
+      
+}
+/***************************************************************************************************************************************************************************************************/
+// Lista di account:
+List<Account> accList = new List<Account>()={
+    new Account(Name='Test1'),
+    new Account(Name='Test2'),
+    new Account(Name='Test3')
+};
+/*********************************************************/
+@isTest
+public class TestClassTemperatureConverte {
+  // 
+  static testMethod void CaldoTest(){
+      Decimal Ebol=TemperatureConverte.FahrenheitToCelsius(78);
+      system.assertEquals(25.5556,Ebol);
+  } 
+  //
+  static testMethod void EbollizioneTest(){
+      Decimal Ebol=TemperatureConverte.FahrenheitToCelsius(212);
+      system.assertEquals(100,Ebol);
+  }
+  //
+  static testMethod void CongelamentoTest(){
+      Decimal Cong=TemperatureConverte.FahrenheitToCelsius(32);
+      system.assertEquals(0,Cong);
+  }
+  //
+  static testMethod void FreddoTest(){
+      Decimal Ebol=TemperatureConverte.FahrenheitToCelsius(-23.3333);
+      system.assertEquals(-10,Ebol);
+  }
+}
+// Inserimento in db dei database:
+insert accList;
+
+// Creazione opportunità collegata ad un account:
+insert(new Opportunity(Name=accList[1].Name + 'Opportunity',
+                       StageName = 'Qualification',
+                       CloseDate = system.today(),
+                       AccountId = accList[1].Id));
+
+delete accList;
+
+ /**************************************************************************************************************************************************************************************************/
+// Lista di account:
+List<Account> accList = new List<Account>()={
+    new Account(Name='Test1'),
+    new Account(Name='Test2'),
+    new Account(Name='Test3')
+};
+
+// Inserimento in db dei database:
+insert accList;
+
+// Creazione opportunità collegata ad un account:
+insert(new Opportunity(Name=accList[1].Name + 'Opportunity',
+                       StageName = 'Qualification',
+                       CloseDate = system.today(),
+                       AccountId = accList[1].Id));
+
+ 
+
+try{
+      delete accList;  
+    }
+catch(DMLexception e){ system.debug('Error: '+ e.getMessage());}
+/***************************************************************************************************************************************************************************************************/
+trigger AccountTriggerWithoutHandler on Account (before delete,after insert,after update) {
+ //
+ List <Account> RicercaDati= new List<account>();
+ List<Opportunity> listaAcc = new List<Opportunity>();
+ //
+ if(Trigger.isBefore && Trigger.isDelete){
+      // Ciclo di iterazione con SELECT    
+      for(Account accounts: [SELECT Id,Name FROM Account WHERE Id IN : Trigger.old AND Id IN (SELECT AccountId FROM Opportunity)]){
+        if(accounts.Id!=NULL){ // Record non cancellabile
+           Account app=Trigger.oldmap.get(accounts.Id); 
+           app.addError('Record non cancellabile,è presente un opportunita');  
+        }
+     else{ // Se è cancellabile
+       RicercaDati.add(accounts);   
+     }
+    Delete RicercaDati;
+ }
+ //
+ }
+ //
+ if((Trigger.isAfter && Trigger.isInsert) || (Trigger.isAfter && Trigger.isUpdate)){}
+    // Mappatura dei dati  con selezione dei record:
+ Map<Id,Account> AccEopp = new Map<Id,Account>(
+       [SELECT Id,(SELECT Id FROM Opportunities ) FROM Account WHERE Id IN : Trigger.new ]
+     ); 
+ // Ciclo di ricerca:
+ for(Account acts : Trigger.new){
+     if(AccEopp.get(acts.Id).Opportunities.size()==0) {
+         listaAcc.add(new Opportunity(Name=acts.name+'Opportunity',StageName='',CloseDate=system.today(),AccountId=acts.Id));
+     }
+ }
+ //
+ if(listaAcc.size()>0){
+    insert listaAcc;       
+  }  
+ }
+    
+/****************************************************************************************************************************************************************************/
+
+trigger OpportunityCreateTask on Opportunity (after insert,after update) {
+    //
+    List<Task> newTaskToInsert= new List<Task>();
+    //
+    if(Trigger.isAfter && Trigger.isInsert){
+      for(Opportunity app: [SELECT Id,Name,StageName FROM Opportunity WHERE Id IN :Trigger.New AND Stagename='Closed won']){
+         Task aP = new Task(Subject='Nuovo task',WhatID=app.AccountId,Status='Active');
+         newTaskToInsert.add(aP); 
+          /*
+           *if(app.StageName=='Closed won'){
+            // 
+            Task a = new Task(Subject='Nuovo task',WhatID=app.AccountId);
+            // Settare task collegato,campo What,Subject
+            newTaskToInsert.add(a);  
+          */
+         }
+         insert newTaskToInsert;   
+    }
+     
+ }
+/***************************************************************************************************************************************************************************/
+@isTest
+public class AddContactTrigger_Test {
+   // Metodo di test:
+    static testMethod void AddCandidate(){
+      // Creazione del candidato di test:
+      Candidate__c CandToIns= new Candidate__c(First_name__c='Cand0',Last_name__c='Test');  
+      // Inserimento nel database:
+      database.insert(CandToIns);
+      //Ricerca del contatto:
+      Contact ct=[SELECT Firstname,Lastname FROM Contact WHERE Firstname='Cand0' AND Lastname='Test'];
+      // Asserts:
+      system.assert(ct.FirstName==CandToIns.First_name__c);
+      system.assert(ct.LastName==CandToIns.Last_name__c);
+    } 
+
+}
+/*****************************************************************************************************************************************************************************/
+public class TVRemoteControl {
+    // Volume to be modified
+    Integer volume;
+    // Constant for maximum volume value
+    static final Integer MAX_VOLUME = 50;   
+    
+    // Constructor
+    public TVRemoteControl(Integer v) {
+        // Set initial value for volume
+        volume = v;
+    }
+       
+    public Integer increaseVolume(Integer amount) {
+        volume += amount;
+        if (volume > MAX_VOLUME) {
+            volume = MAX_VOLUME;
+        }
+        return volume;
+    }
+   
+    public Integer decreaseVolume(Integer amount) {
+        volume -= amount;
+        if (volume < 0) {
+            volume = 0;
+        } 
+        return volume;
+    }   
+    
+    public static List<String>  getMenuOptions(String option) {
+        List<String> menu ;
+        if(option =='AUDIO'){
+            menu = new List <String> {'Input Audio Device','Output Audio Device'};
+        }else if(option =='VIDEO'){
+            menu = new List <String>{'Input Video Device', 'Output Video Device'};
+        }else{
+            menu = new List <String> {'Invalid Option'};
+        }
+        return menu;
+    }
+      
+}
+
+
+/*******************************************************************************************************************************************************************************/
+@isTest
+public class TestTVRemoteControl {
+    // Oggetto TVRemoteControl di appoggio:
+    TVRemoteControl app = new TVRemoteControl(50);
+    //
+    static testMethod void testVolumeIncrease(){
+    // Oggetto TVRemoteControl di appoggio:
+    TVRemoteControl app = new TVRemoteControl(0);
+    //
+    Integer VI=app.increaseVolume(30);
+    system.assertEquals(30,VI);
+    }
+    //
+    static testMethod void testVolumeDecrease(){
+    // Oggetto TVRemoteControl di appoggio:
+    TVRemoteControl app = new TVRemoteControl(50);
+    //
+    Integer VD=app.decreaseVolume(45);
+    system.assertEquals(5,VD);
+    }
+    //
+    static testMethod void testVolumeIncreaseOverMax(){
+    // Oggetto TVRemoteControl di appoggio:
+    TVRemoteControl app = new TVRemoteControl(0);
+    //
+    Integer VoverMax=app.increaseVolume(105);
+    system.assertEquals(50,VoverMax);
+    }
+    //
+    static testMethod void testVolumeDecreaseUnderMin(){
+     // Oggetto TVRemoteControl di appoggio:
+     TVRemoteControl app = new TVRemoteControl(10);
+     //
+     Integer VoverMin=app.decreaseVolume(100);
+     system.assertEquals(0,VoverMin);   
+    }
+    //
+    static testMethod void testGetMenuOptions(){
+    //
+    List<String> MenuAudio = TVRemoteControl.getMenuOptions('Audio');
+    List<String> MenuVideo = TVRemoteControl.getMenuOptions('Video');
+    system.assertEquals(MenuAudio[0],'Audio');
+    system.assertEquals(MenuVideo[1],'Video');
+        
+    }
+}
+/*****************************************************************************************************************************************************************************
+@isTest
+public class TestAddRelatedRecord {
+ //
+ static testMethod void testLoadData(){
+ //
+ List<sObject> LS = Test.loadData(Account.sobjectType,'TestAccounts');
+ System.assert(LS.size()==3);        
+ //
+ Account A1=(Account)LS[0];
+ String acctName = A1.Name;
+ system.debug(acctName);
+     
+ // Query di ricerca:
+ Opportunity Ricerca = [SELECT Name  FROM Opportunity WHERE Name=: acctName +'Opportunity'];
+ system.assert(Ricerca.AccountId==A1.Id);
+ }
+}
+
+/*******************************************************************************************************************************************************************************/
+public class OpportunityListCon2 {
+    public ApexPages.StandardSetController setCon{
+        get {
+            if(setCon==null){
+                setCon = new ApexPages.StandardSetController(Database.getQueryLocator([SELECT Name,CloseDate FROM Opportunity]))
+            }
+            return setCon;
+        }
+        set;
+    }
+    //
+    public List<Opportunity> getOpportunities(){
+         return (List<Opportunity>) setCon.getRecords();
+    }
+}
+
+<apex:page controller="OpportunityListCon2 ">
+ <apex:pageBlock>
+  <apex:pageBlockTable value="{!Opportunities}" var="O">
+   <apex:column value="{!O.Name}" />
+   <apex:column value="{!O.CloseDate}" />   
+  </apex:pageBlockTable>   
+ </apex:pageBlock>
+</apex:page>
+/***************************************************************************************************************************************************************************/
+
+
+
+
+
+sdasdd
+
+
+
+
+
+

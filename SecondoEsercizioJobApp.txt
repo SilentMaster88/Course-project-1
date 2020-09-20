@@ -1,0 +1,27 @@
+// Position dove Department uguale a engineering
+// Se hanno figli cancellarli e creare una nuova job_application
+// Liste di appoggio:
+List <Job_Application__c> DelJobApp = new List<Job_Application__c>();
+List <Job_Application__c> AddJobApp = new List<Job_Application__c>();
+
+//
+for(List <Position__c> RicercaDati = [SELECT Id,(SELECT Id FROM Job_Applications__r) FROM Position__c WHERE Department__c='engineering']){
+ for(Position__c posz : RicercaDati){
+  if(posz.Job_Applications__r. size() > 0){
+    for(Job_Application__c ap : posz.Job_Applications__r){
+                	DelJobApp.add(ap);
+    }
+    AddJobApp.add(new Job_Application__c(Position__c = posz.ID, Status__c = 'Open'));
+  }
+  else{
+     AddJobApp.add(new Job_Application__c(Position__c = posz.ID, Status__c = 'Open'));
+  }
+ } 
+}
+// Cancellazione dei JobApp:
+delete DelJobApp;
+
+// Inserimento dei nuovi JobApp
+insert AddJobApp;
+ 
+ 
